@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import ApiError from "../utils/apiError";
-import { verifyToken } from "../utils/jwt";
+import ApiError from "../errors/apiError";
+import { verifyToken } from "./jwt";
 
 export default async function auth(request: FastifyRequest, _reply: FastifyReply) {
   const authHeader = request.headers.authorization;

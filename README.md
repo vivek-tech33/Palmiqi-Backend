@@ -17,14 +17,21 @@ Starter backend structure using TypeScript, Fastify, Node.js, PostgreSQL, and Pr
 prisma/
   schema.prisma
 src/
-  config/
-  controllers/
-  lib/
-  middlewares/
-  routes/
-  services/
-  types/
-  utils/
+  core/
+    config/
+    database/
+    errors/
+    http/
+    security/
+    types/
+  modules/
+    auth/
+    identity/
+    profile/
+    preferences/
+    feedback/
+    insights/
+    mood/
   app.ts
   server.ts
 ```
@@ -88,4 +95,3 @@ http://localhost:4000/docs
 ## links
 
 Database Model - https://app.chartdb.io/invite/164930cc39a34e23806792
-

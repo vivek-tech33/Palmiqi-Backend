@@ -1,35 +1,18 @@
 import bcrypt from "bcryptjs";
 import { OAuth2Client } from "google-auth-library";
-import { User } from "@prisma/client";
-import env from "../config/env";
-import prisma from "../lib/prisma";
-import ApiError from "../utils/apiError";
-import { signToken } from "../utils/jwt";
+import env from "../../core/config/env";
+import prisma from "../../core/database/prisma";
+import ApiError from "../../core/errors/apiError";
+import { signToken } from "../../core/security/jwt";
+import {
+  AuthResponse,
+  AuthUser,
+  GoogleLoginPayload,
+  LoginPayload,
+  RegisterPayload,
+} from "./types";
 
 const googleClient = new OAuth2Client();
-
-type RegisterPayload = {
-  name: string;
-  email: string;
-  password: string;
-  language?: string;
-};
-
-type LoginPayload = {
-  email: string;
-  password: string;
-};
-
-type GoogleLoginPayload = {
-  idToken: string;
-};
-
-type AuthUser = Pick<User, "id" | "email" | "name" | "emailVerified" | "imageUrl">;
-
-type AuthResponse = {
-  user: AuthUser;
-  token: string;
-};
 
 function toAuthResponse(user: AuthUser): AuthResponse {
   const token = signToken({ userId: user.id, email: user.email });
@@ -106,7 +89,9 @@ export async function login(payload: LoginPayload): Promise<AuthResponse> {
   return toAuthResponse(user);
 }
 
-export async function loginWithGoogle(payload: GoogleLoginPayload): Promise<AuthResponse> {
+export async function loginWithGoogle(
+  payload: GoogleLoginPayload,
+): Promise<AuthResponse> {
   if (!env.GOOGLE_CLIENT_ID) {
     throw new ApiError(500, "GOOGLE_CLIENT_ID is not configured");
   }

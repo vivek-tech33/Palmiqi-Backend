@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from "fastify";
-import * as authController from "../controllers/auth.controller";
+import * as authController from "./controller";
 import {
   authGoogleRouteSchema,
   authLoginRouteSchema,

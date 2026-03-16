@@ -2,9 +2,9 @@ import Fastify, { FastifyInstance } from "fastify";
 import cors from "@fastify/cors";
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
-import routes from "./routes";
-import notFound from "./middlewares/notFound";
-import errorHandler from "./middlewares/errorHandler";
+import modules from "./modules";
+import notFound from "./core/http/notFound";
+import errorHandler from "./core/http/errorHandler";
 
 export default async function buildApp(): Promise<FastifyInstance> {
   const app = Fastify({
@@ -45,7 +45,7 @@ export default async function buildApp(): Promise<FastifyInstance> {
     message: "Server is healthy",
   }));
 
-  await app.register(routes, { prefix: "/api" });
+  await app.register(modules, { prefix: "/api" });
   app.setNotFoundHandler(notFound);
   app.setErrorHandler(errorHandler);
 
