@@ -85,43 +85,7 @@ http://localhost:4000/docs
 - `GET /api/mood-logs`
 - `POST /api/mood-logs`
 
-## Assumptions From Your Diagram
+## links
 
-- `User` is the main auth table.
-- `Account` supports social login providers.
-- `Profile`, `Preference`, `MulankReading`, and current `DailyPrediction` are modeled as one-to-one with `User`.
-- `Feedback` and `MoodLog` are modeled as one-to-many because users usually create multiple entries over time.
-- Nested structures in `MulankReading` and `DailyPrediction.predictions` are stored in PostgreSQL `jsonb` columns through Prisma `Json`.
+Database Model - https://app.chartdb.io/invite/164930cc39a34e23806792
 
-If you want, the next pass can add:
-
-- refresh token persistence
-- OTP/email verification flow
-- role-based auth
-- file uploads for palm images
-- separate tables instead of JSON for predictions/insights
-
-## Google Login
-
-This backend supports Google sign-in by verifying a Google ID token from the frontend.
-
-1. Create a Google OAuth client.
-2. Put the client ID into `.env` as `GOOGLE_CLIENT_ID`.
-3. From the frontend, send the Google `idToken` to:
-
-```http
-POST /api/auth/google
-Content-Type: application/json
-```
-
-```json
-{
-  "idToken": "google-id-token-from-frontend"
-}
-```
-
-Behavior:
-
-- if the Google account already exists in `Account`, the user is logged in
-- if the email exists in `User` and Google says it is verified, the Google account is linked
-- if the email does not exist, a new user and Google account are created
