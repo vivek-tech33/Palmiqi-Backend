@@ -3,33 +3,16 @@ import { OAuth2Client } from "google-auth-library";
 import env from "../../core/config/env";
 import prisma from "../../core/database/prisma";
 import ApiError from "../../core/errors/apiError";
-import { signToken } from "../../core/security/jwt";
-import {
-  AuthResponse,
-  AuthUser,
-  GoogleLoginPayload,
-  LoginPayload,
-  RegisterPayload,
-} from "./types";
+import { GoogleLoginRequestBody } from "./models/requests/googleLogin.request";
+import { LoginRequestBody } from "./models/requests/login.request";
+import { RegisterRequestBody } from "./models/requests/register.request";
+import { AuthResponse, toAuthResponse } from "./models/responses/auth.response";
 
 const googleClient = new OAuth2Client();
 
-function toAuthResponse(user: AuthUser): AuthResponse {
-  const token = signToken({ userId: user.id, email: user.email });
-
-  return {
-    user: {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      emailVerified: user.emailVerified,
-      imageUrl: user.imageUrl,
-    },
-    token,
-  };
-}
-
-export async function register(payload: RegisterPayload): Promise<AuthResponse> {
+export async function register(
+  payload: RegisterRequestBody,
+): Promise<AuthResponse> {
   const existingUser = await prisma.user.findUnique({
     where: { email: payload.email },
   });
@@ -67,7 +50,7 @@ export async function register(payload: RegisterPayload): Promise<AuthResponse> 
   return toAuthResponse(user);
 }
 
-export async function login(payload: LoginPayload): Promise<AuthResponse> {
+export async function login(payload: LoginRequestBody): Promise<AuthResponse> {
   const user = await prisma.user.findUnique({
     where: { email: payload.email },
   });
@@ -90,7 +73,7 @@ export async function login(payload: LoginPayload): Promise<AuthResponse> {
 }
 
 export async function loginWithGoogle(
-  payload: GoogleLoginPayload,
+  payload: GoogleLoginRequestBody,
 ): Promise<AuthResponse> {
   if (!env.GOOGLE_CLIENT_ID) {
     throw new ApiError(500, "GOOGLE_CLIENT_ID is not configured");

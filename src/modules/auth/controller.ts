@@ -1,10 +1,12 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import * as authService from "./service";
-import { GoogleLoginPayload, LoginPayload, RegisterPayload } from "./types";
+import { GoogleLoginRequestBody } from "./models/requests/googleLogin.request";
+import { LoginRequestBody } from "./models/requests/login.request";
+import { RegisterRequestBody } from "./models/requests/register.request";
 
 export async function register(
   request: FastifyRequest<{
-    Body: RegisterPayload;
+    Body: RegisterRequestBody;
   }>,
   reply: FastifyReply,
 ) {
@@ -19,7 +21,7 @@ export async function register(
 
 export async function login(
   request: FastifyRequest<{
-    Body: LoginPayload;
+    Body: LoginRequestBody;
   }>,
   reply: FastifyReply,
 ) {
@@ -34,7 +36,7 @@ export async function login(
 
 export async function googleLogin(
   request: FastifyRequest<{
-    Body: GoogleLoginPayload;
+    Body: GoogleLoginRequestBody;
   }>,
   reply: FastifyReply,
 ) {
