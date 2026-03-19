@@ -22,7 +22,7 @@ src/
     database/
     errors/
     http/
-    security/
+    storage/
     types/
   modules/
     auth/
@@ -52,14 +52,19 @@ copy .env.example .env
 
 3. Update `DATABASE_URL` for your PostgreSQL database.
 
-4. Generate Prisma client and run migrations:
+4. Configure auth and uploads:
+
+- Set `GOOGLE_CLIENT_ID` for a single Google OAuth client, or `GOOGLE_CLIENT_IDS` as a comma-separated list for Android/iOS/web clients.
+- Set the S3 variables used for palm image uploads.
+
+5. Generate Prisma client and run migrations:
 
 ```bash
 npm run prisma:generate
 npm run prisma:migrate -- --name init
 ```
 
-5. Start the server:
+6. Start the server:
 
 ```bash
 npm run dev
@@ -72,7 +77,7 @@ npm run build
 npm start
 ```
 
-6. Open Swagger UI:
+7. Open Swagger UI:
 
 ```text
 http://localhost:4000/docs
@@ -85,6 +90,7 @@ http://localhost:4000/docs
 - `POST /api/auth/google`
 - `GET /api/me`
 - `PUT /api/profile`
+- `POST /api/profile/palm-upload-url`
 - `PUT /api/preferences`
 - `POST /api/feedback`
 - `PUT /api/readings/mulank`

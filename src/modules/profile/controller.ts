@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import ApiError from "../../core/errors/apiError";
 import * as profileService from "./service";
-import { ProfilePayload } from "./types";
+import { PalmUploadUrlPayload, ProfilePayload } from "./types";
 
 function getAuthenticatedUserId(request: FastifyRequest): string {
   if (!request.user) {
@@ -25,6 +25,24 @@ export async function upsertProfile(
   return reply.status(200).send({
     success: true,
     message: "Profile saved successfully",
+    data,
+  });
+}
+
+export async function createPalmUploadUrl(
+  request: FastifyRequest<{
+    Body: PalmUploadUrlPayload;
+  }>,
+  reply: FastifyReply,
+) {
+  const data = await profileService.createPalmUploadUrl(
+    getAuthenticatedUserId(request),
+    request.body,
+  );
+
+  return reply.status(200).send({
+    success: true,
+    message: "Palm upload URL created successfully",
     data,
   });
 }

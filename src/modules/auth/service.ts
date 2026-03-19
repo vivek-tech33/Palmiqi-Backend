@@ -10,6 +10,26 @@ import { AuthResponse, toAuthResponse } from "./models/responses/auth.response";
 
 const googleClient = new OAuth2Client();
 
+function getGoogleAudiences(): string[] {
+  const audiences = [
+    env.GOOGLE_CLIENT_ID,
+    ...(env.GOOGLE_CLIENT_IDS
+      ? env.GOOGLE_CLIENT_IDS.split(",").map((value) => value.trim())
+      : []),
+  ].filter((value): value is string => Boolean(value));
+
+  const uniqueAudiences = [...new Set(audiences)];
+
+  if (uniqueAudiences.length === 0) {
+    throw new ApiError(
+      500,
+      "GOOGLE_CLIENT_ID or GOOGLE_CLIENT_IDS must be configured",
+    );
+  }
+
+  return uniqueAudiences;
+}
+
 export async function register(
   payload: RegisterRequestBody,
 ): Promise<AuthResponse> {
@@ -75,13 +95,9 @@ export async function login(payload: LoginRequestBody): Promise<AuthResponse> {
 export async function loginWithGoogle(
   payload: GoogleLoginRequestBody,
 ): Promise<AuthResponse> {
-  if (!env.GOOGLE_CLIENT_ID) {
-    throw new ApiError(500, "GOOGLE_CLIENT_ID is not configured");
-  }
-
   const ticket = await googleClient.verifyIdToken({
     idToken: payload.idToken,
-    audience: env.GOOGLE_CLIENT_ID,
+    audience: getGoogleAudiences(),
   });
 
   const googleProfile = ticket.getPayload();
@@ -121,7 +137,10 @@ export async function loginWithGoogle(
     ? await prisma.user.update({
         where: { id: existingUser.id },
         data: {
-          name: existingUser.name || googleProfile.name || googleProfile.email.split("@")[0],
+          name:
+            existingUser.name ||
+            googleProfile.name ||
+            googleProfile.email.split("@")[0],
           emailVerified: true,
           imageUrl: existingUser.imageUrl || googleProfile.picture,
           accounts: {
@@ -136,7 +155,7 @@ export async function loginWithGoogle(
         data: {
           email: googleProfile.email,
           name: googleProfile.name || googleProfile.email.split("@")[0],
-          password: "",
+          password: null,
           emailVerified: true,
           imageUrl: googleProfile.picture,
           accounts: {
