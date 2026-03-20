@@ -12,11 +12,18 @@ const profileBodySchema = {
   properties: {
     birthDate: { type: "string", format: "date" },
     timeOfBirth: {
-      type: "string",
-      pattern: "^([01]\\d|2[0-3]):[0-5]\\d$",
+      anyOf: [
+        {
+          type: "string",
+          pattern: "^([01]\\d|2[0-3]):[0-5]\\d$",
+        },
+        { type: "null" },
+      ],
     },
     placeOfBirth: { type: "string", minLength: 1 },
-    palmImageUrl: { type: "string", format: "uri" },
+    palmImageUrl: {
+      anyOf: [{ type: "string", format: "uri" }, { type: "null" }],
+    },
     personalizationOn: {
       type: "array",
       items: {
@@ -27,6 +34,7 @@ const profileBodySchema = {
       maxItems: 3,
       uniqueItems: true,
     },
+    onboardingCompleted: { type: "boolean" },
   },
 } as const;
 

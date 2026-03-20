@@ -1,5 +1,6 @@
 export type MoodLogPayload = {
   mood: string;
+  score?: number;
   notes?: string;
-  loggedAt?: string;
+  loggedDate?: string;
 };

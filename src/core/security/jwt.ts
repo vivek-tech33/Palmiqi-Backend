@@ -6,10 +6,20 @@ export type AuthTokenPayload = {
   email: string;
 };
 
+function getJwtExpiresIn(): SignOptions["expiresIn"] {
+  const rawValue = env.JWT_EXPIRES_IN;
+
+  if (/^\d+$/.test(rawValue)) {
+    return Number(rawValue);
+  }
+
+  return rawValue as SignOptions["expiresIn"];
+}
+
 export function signToken(payload: AuthTokenPayload): string {
   return jwt.sign(payload, env.JWT_SECRET, {
-    expiresIn: env.JWT_EXPIRES_IN,
-  } as SignOptions);
+    expiresIn: getJwtExpiresIn(),
+  });
 }
 
 export function verifyToken(token: string): AuthTokenPayload {

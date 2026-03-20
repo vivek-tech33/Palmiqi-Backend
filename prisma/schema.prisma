@@ -107,7 +107,6 @@ model MulankReading {
   @@index([userId, readingDate])
 }
 
-
 model DailyPrediction {
   id              String   @id @default(cuid())
   userId          String
@@ -122,22 +121,6 @@ model DailyPrediction {
 
   @@unique([userId, predictionDate, language])
   @@index([userId, predictionDate])
-}
-
-model MoodLog {
-  id         String   @id @default(cuid())
-  userId     String
-  mood       String
-  score      Int?
-  notes      String?
-  loggedDate DateTime @db.Date
-  loggedAt   DateTime @default(now())
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, loggedDate])
-  @@index([userId, loggedAt])
 }
 
 model DailyInsight {
@@ -171,14 +154,30 @@ model DailyInsight {
 }
 
 model UserCredit {
-  id           String   @id @default(cuid())
-  userId       String   @unique
-  totalCredits Int      @default(2)
-  usedCredits  Int      @default(0)
+  id           String    @id @default(cuid())
+  userId       String    @unique
+  totalCredits Int       @default(2)
+  usedCredits  Int       @default(0)
   expiresAt    DateTime?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model MoodLog {
+  id         String   @id @default(cuid())
+  userId     String
+  mood       String
+  score      Int?
+  notes      String?
+  loggedDate DateTime @db.Date
+  loggedAt   DateTime @default(now())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, loggedDate])
+  @@index([userId, loggedAt])
 }
 
 enum Personalize {

@@ -12,10 +12,11 @@ export type PersonalizationOption = (typeof PERSONALIZE_OPTIONS)[number];
 
 export type ProfilePayload = {
   birthDate?: string;
-  timeOfBirth?: string;
+  timeOfBirth?: string | null;
   placeOfBirth?: string;
-  palmImageUrl?: string;
+  palmImageUrl?: string | null;
   personalizationOn?: PersonalizationOption[];
+  onboardingCompleted?: boolean;
 };
 
 export type PalmUploadUrlPayload = {

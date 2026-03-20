@@ -16,8 +16,9 @@ const authTokenDataSchema = {
       required: ["id", "email", "name", "emailVerified"],
     },
     token: { type: "string" },
+    onboardingCompleted: { type: "boolean" },
   },
-  required: ["user", "token"],
+  required: ["user", "token", "onboardingCompleted"],
 } as const;
 
 export const authRegisterRouteSchema: FastifySchema = {

@@ -9,20 +9,6 @@ const SUPPORTED_PALM_IMAGE_TYPES = new Map<string, string>([
   ["image/webp", ".webp"],
 ]);
 
-function hasBirthDetails(payload: ProfilePayload) {
-  return [
-    payload.birthDate,
-    payload.timeOfBirth,
-    payload.placeOfBirth,
-  ].some((value) => value !== undefined);
-}
-
-function hasCompleteBirthDetails(payload: ProfilePayload) {
-  return Boolean(
-    payload.birthDate && payload.timeOfBirth && payload.placeOfBirth,
-  );
-}
-
 function normalizeBirthDate(birthDate: string): Date {
   const normalizedBirthDate = new Date(`${birthDate}T00:00:00.000Z`);
 
@@ -34,13 +20,6 @@ function normalizeBirthDate(birthDate: string): Date {
 }
 
 function normalizeProfilePayload(payload: ProfilePayload) {
-  if (hasBirthDetails(payload) && !hasCompleteBirthDetails(payload)) {
-    throw new ApiError(
-      400,
-      "birthDate, timeOfBirth, and placeOfBirth must be provided together",
-    );
-  }
-
   if (payload.personalizationOn) {
     const uniqueSelections = new Set(payload.personalizationOn);
 
@@ -49,15 +28,30 @@ function normalizeProfilePayload(payload: ProfilePayload) {
     }
   }
 
+  if (payload.birthDate && !payload.placeOfBirth) {
+    throw new ApiError(400, "placeOfBirth is required when birthDate is provided");
+  }
+
+  if (payload.timeOfBirth && !payload.birthDate) {
+    throw new ApiError(400, "birthDate is required when timeOfBirth is provided");
+  }
+
   return {
     ...(payload.birthDate
       ? { birthDate: normalizeBirthDate(payload.birthDate) }
       : {}),
-    ...(payload.timeOfBirth ? { timeOfBirth: payload.timeOfBirth } : {}),
+    ...(payload.timeOfBirth !== undefined
+      ? { timeOfBirth: payload.timeOfBirth }
+      : {}),
     ...(payload.placeOfBirth ? { placeOfBirth: payload.placeOfBirth } : {}),
-    ...(payload.palmImageUrl ? { palmImageUrl: payload.palmImageUrl } : {}),
+    ...(payload.palmImageUrl !== undefined
+      ? { palmImageUrl: payload.palmImageUrl }
+      : {}),
     ...(payload.personalizationOn
       ? { personalizationOn: payload.personalizationOn }
+      : {}),
+    ...(payload.onboardingCompleted !== undefined
+      ? { onboardingCompleted: payload.onboardingCompleted }
       : {}),
   };
 }

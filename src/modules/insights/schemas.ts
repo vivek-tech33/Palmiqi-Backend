@@ -9,11 +9,12 @@ import {
 const mulankReadingBodySchema = {
   type: "object",
   properties: {
-    insights: { type: "object", additionalProperties: true },
-    mulankAnalysis: { type: "object", additionalProperties: true },
-    luckyElements: { type: "object", additionalProperties: true },
+    content: { type: "object", additionalProperties: true },
+    overallScore: { type: "integer", minimum: 0, maximum: 100 },
+    readingDate: { type: "string", format: "date" },
+    language: { type: "string", minLength: 2 },
   },
-  required: ["insights", "mulankAnalysis", "luckyElements"],
+  required: ["content", "readingDate"],
 } as const;
 
 const dailyPredictionBodySchema = {
@@ -22,8 +23,10 @@ const dailyPredictionBodySchema = {
     energy: { type: "integer", minimum: 0, maximum: 100 },
     predictions: { type: "object", additionalProperties: true },
     tomorrowPreview: { type: "string" },
+    predictionDate: { type: "string", format: "date" },
+    language: { type: "string", minLength: 2 },
   },
-  required: ["energy", "predictions"],
+  required: ["energy", "predictions", "predictionDate"],
 } as const;
 
 export const mulankReadingRouteSchema: FastifySchema = {

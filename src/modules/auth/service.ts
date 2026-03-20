@@ -10,6 +10,19 @@ import { AuthResponse, toAuthResponse } from "./models/responses/auth.response";
 
 const googleClient = new OAuth2Client();
 
+const authUserSelect = {
+  id: true,
+  email: true,
+  name: true,
+  emailVerified: true,
+  imageUrl: true,
+  profile: {
+    select: {
+      onboardingCompleted: true,
+    },
+  },
+} as const;
+
 function getGoogleAudiences(): string[] {
   const audiences = [
     env.GOOGLE_CLIENT_ID,
@@ -58,13 +71,7 @@ export async function register(
         },
       },
     },
-    select: {
-      id: true,
-      email: true,
-      name: true,
-      emailVerified: true,
-      imageUrl: true,
-    },
+    select: authUserSelect,
   });
 
   return toAuthResponse(user);
@@ -73,6 +80,10 @@ export async function register(
 export async function login(payload: LoginRequestBody): Promise<AuthResponse> {
   const user = await prisma.user.findUnique({
     where: { email: payload.email },
+    select: {
+      ...authUserSelect,
+      password: true,
+    },
   });
 
   if (!user) {
@@ -89,7 +100,8 @@ export async function login(payload: LoginRequestBody): Promise<AuthResponse> {
     throw new ApiError(401, "Invalid email or password");
   }
 
-  return toAuthResponse(user);
+  const { password: _password, ...authUser } = user;
+  return toAuthResponse(authUser);
 }
 
 export async function loginWithGoogle(
@@ -120,8 +132,10 @@ export async function loginWithGoogle(
         providerAccountId,
       },
     },
-    include: {
-      user: true,
+    select: {
+      user: {
+        select: authUserSelect,
+      },
     },
   });
 
@@ -150,6 +164,7 @@ export async function loginWithGoogle(
             },
           },
         },
+        select: authUserSelect,
       })
     : await prisma.user.create({
         data: {
@@ -174,6 +189,7 @@ export async function loginWithGoogle(
             },
           },
         },
+        select: authUserSelect,
       });
 
   return toAuthResponse(user);

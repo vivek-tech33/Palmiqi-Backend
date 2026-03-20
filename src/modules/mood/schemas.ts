@@ -10,8 +10,9 @@ const moodLogBodySchema = {
   type: "object",
   properties: {
     mood: { type: "string", minLength: 1 },
+    score: { type: "integer", minimum: 0, maximum: 100 },
     notes: { type: "string", maxLength: 2000 },
-    loggedAt: { type: "string", format: "date-time" },
+    loggedDate: { type: "string", format: "date" },
   },
   required: ["mood"],
 } as const;
@@ -31,7 +32,7 @@ export const moodLogListRouteSchema: FastifySchema = {
 
 export const moodLogCreateRouteSchema: FastifySchema = {
   tags: ["Mood"],
-  summary: "Create mood log",
+  summary: "Create or update a daily mood log",
   security: bearerSecurity,
   body: moodLogBodySchema,
   response: {
