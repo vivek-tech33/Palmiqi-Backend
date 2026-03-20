@@ -1,0 +1,191 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String            @id @default(cuid())
+  email            String            @unique
+  name             String
+  password         String?
+  emailVerified    Boolean           @default(false)
+  imageUrl         String?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  accounts         Account[]
+  profile          Profile?
+  preference       Preference?
+  feedbacks        Feedback[]
+  mulankReadings   MulankReading[]
+  dailyPredictions DailyPrediction[]
+  dailyInsights    DailyInsight[]
+  userCredit       UserCredit?
+  moodLogs         MoodLog[]
+}
+
+model Account {
+  id                String    @id @default(cuid())
+  userId            String
+  provider          String
+  providerAccountId String
+  accessToken       String?
+  refreshToken      String?
+  expiresAt         DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@unique([userId, provider])
+  @@index([userId])
+}
+
+model Profile {
+  id                  String        @id @default(cuid())
+  userId              String        @unique
+  birthDate           DateTime?     @db.Date
+  timeOfBirth         String?
+  placeOfBirth        String?
+  palmImageUrl        String?
+  onboardingCompleted Boolean       @default(false)
+  currentStreak       Int           @default(0)
+  lastCompletionDate  DateTime?     @db.Date
+  sunSign             String?
+  moonSign            String?
+  lagnaSign           String?
+  mulank              Int?
+  rulingPlanet        String?
+  mulankTitle         String?
+  mulankDescription   Json?
+  mulankPros          Json?
+  mulankCons          Json?
+  personalizationOn   Personalize[] @default([])
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  user                User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Preference {
+  id             String    @id @default(cuid())
+  userId         String    @unique
+  language       String    @default("en")
+  pushEnabled    Boolean   @default(true)
+  lastClearCache DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Feedback {
+  id        String   @id @default(cuid())
+  userId    String
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model MulankReading {
+  id           String   @id @default(cuid())
+  userId       String
+  content      Json
+  overallScore Int?
+  readingDate  DateTime @db.Date
+  language     String   @default("en")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, readingDate, language])
+  @@index([userId, readingDate])
+}
+
+model DailyPrediction {
+  id              String   @id @default(cuid())
+  userId          String
+  energy          Int
+  predictions     Json
+  tomorrowPreview String?
+  predictionDate  DateTime @db.Date
+  language        String   @default("en")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, predictionDate, language])
+  @@index([userId, predictionDate])
+}
+
+model DailyInsight {
+  id                 String   @id @default(cuid())
+  userId             String
+  insightDate        DateTime @db.Date
+  language           String   @default("en")
+  energyLevelMin     Int
+  energyLevelMax     Int
+  energyMorning      String
+  energyMidday       String
+  energyEvening      String
+  summaryHeadline    String
+  summaryDescription String
+  favorableWindows   Json
+  dos                Json
+  donts              Json
+  luckyColor         String
+  luckyColorHex      String
+  luckyNumber        Int
+  luckyGem           String
+  luckyElement       String
+  opportunity        String
+  whyExplanation     String
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, insightDate, language])
+  @@index([userId, insightDate])
+}
+
+model UserCredit {
+  id           String    @id @default(cuid())
+  userId       String    @unique
+  totalCredits Int       @default(2)
+  usedCredits  Int       @default(0)
+  expiresAt    DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model MoodLog {
+  id         String   @id @default(cuid())
+  userId     String
+  mood       String
+  score      Int?
+  notes      String?
+  loggedDate DateTime @db.Date
+  loggedAt   DateTime @default(now())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, loggedDate])
+  @@index([userId, loggedAt])
+}
+
+enum Personalize {
+  CAREER_WORK
+  MONEY_WEALTH
+  LOVE_RELATIONSHIPS
+  HEALTH_ENERGY
+  MENTAL_PEACE
+  PERSONAL_GROWTH
+  BUSINESS
+}
